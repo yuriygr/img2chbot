@@ -49,9 +49,15 @@ bot.dialog('/', [
 		}
 	}
 ]);
+
 bot.dialog('/img', [
 	function (session) {
-		session.send("img");
+        var msg = new builder.Message(session)
+            .attachments([{
+                contentType: "image/jpeg",
+                contentUrl: "https://2ch.hk/b/src/137633492/14762125040290.jpg"
+            }]);
+        session.endDialog(msg);
 	}
 ]);
 bot.dialog('/gif', [
@@ -63,4 +69,9 @@ bot.dialog('/webm', [
 	function (session) {
 		session.send("webm");
 	}
+]);
+bot.dialog('/help', [
+    function (session) {
+        session.endDialog("Я - бот, который даёт тебе смешнявки прямо в твоём мессенджере.");
+    }
 ]);
