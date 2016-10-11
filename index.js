@@ -17,8 +17,8 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
   
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: process.env.MICROSOFT_APP_ID,
-    appPassword: process.env.MICROSOFT_APP_PASSWORD
+	appId: process.env.MICROSOFT_APP_ID,
+	appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 var bot = new builder.UniversalBot(connector);
 
@@ -29,23 +29,38 @@ server.post('/api/messages', connector.listen());
 //=========================================================
 //
 bot.dialog('/', [
-    function (session) {
-        session.send("Три варианта для тебя:");
-        builder.Prompts.choice(session, "command?", ["img", "gif", "webm"]);
-    },
-    function (session, results) {
-        switch (results.repsonse.entity) {
-            case "img":
-                session.replaceDialog("/img");
-                break;
-            default:
-                session.replaceDialog("/");
-                break;
-        }
-    }
+	function (session) {
+		builder.Prompts.choice(session, "Три варианта для тебя:", ["img", "gif", "webm"]);
+	},
+	function (session, results) {
+		switch (results.response.entity) {
+			case "img":
+				session.replaceDialog("/img");
+				break;
+			case "gif":
+				session.replaceDialog("/gif");
+				break;
+			case "webm":
+				session.replaceDialog("/webm");
+				break;
+			default:
+				session.replaceDialog("/");
+				break;
+		}
+	}
 ]);
 bot.dialog('/img', [
-    function (session) {
-        session.send("There's a small house here surrounded by a white fence with a gate. There's a path to the south and west.");
-    }
+	function (session) {
+		session.send("img");
+	}
+]);
+bot.dialog('/gif', [
+	function (session) {
+		session.send("gif");
+	}
+]);
+bot.dialog('/webm', [
+	function (session) {
+		session.send("webm");
+	}
 ]);
