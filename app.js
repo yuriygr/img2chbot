@@ -5,7 +5,8 @@ A simple "Hello World" bot for the Microsoft Bot Framework.
 var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
-var url = 'https://2ch.hk/b/index.json';
+var host = 'https://2ch.hk/b/';
+var url = host + 'index.json';
 
 //=========================================================
 // Bot Setup
@@ -40,6 +41,7 @@ server.post('/api/messages', connector.listen());
 bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|смешнявка/i });
 bot.beginDialogAction('webm', '/webm', { matches: /^webm|\/webm|вебм/i });
 bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i });
+bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|контакты|автор/i });
 
 
 //=========================================================
@@ -50,6 +52,9 @@ function requestFile(url, type) {
 	
 	return fetch(url)
 	.then(function(res) {
+		if (res.status != 200)
+			throw new Error('Абу шатает вакабу');
+
 		return res.json();
 	})
 	.then(function(json) {
@@ -145,14 +150,14 @@ bot.dialog('/img', [
 		requestFile(url, 'img')
 		.then(function(result) {
 			if (!result)
-				throw new Error('Ошибка');
+				throw new Error('Ошибка получения картинки');
 			
 			console.log(result);
 				
 			var msg = new builder.Message(session)
 				.attachments([{
 					contentType: "image/jpeg",
-					contentUrl: "https://2ch.hk/b/" + result
+					contentUrl: host + result
 				}]);
 			session.endDialog(msg);
 		})
@@ -166,14 +171,14 @@ bot.dialog('/webm', [
 		requestFile(url, 'webm')
 		.then(function(result) {
 			if (!result)
-				throw new Error('Ошибка');
+				throw new Error('Ошибка получения вебм');
 				
 			console.log(result);
 			
 			var msg = new builder.Message(session)
 				.attachments([{
 					contentType: "video/webm",
-					contentUrl: "https://2ch.hk/b/" + result
+					contentUrl: host + result
 				}]);
 			session.endDialog(msg);
 		})
@@ -186,6 +191,12 @@ bot.dialog('/webm', [
 bot.dialog('/help', [
 	function (session) {
 		session.endDialog("Я - раковый бот, который даёт тебе смешнявки прямо в твоём мессенджере.");
+		session.beginDialog('/');
+	}
+]);
+bot.dialog('/contact', [
+	function (session) {
+		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
 		session.beginDialog('/');
 	}
 ]);
