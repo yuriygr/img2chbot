@@ -5,7 +5,6 @@ A simple "Hello World" bot for the Microsoft Bot Framework.
 var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
-var request = require("request");
 var url = 'https://2ch.hk/b/index.json';
 
 //=========================================================
@@ -38,10 +37,8 @@ server.post('/api/messages', connector.listen());
 // Bots Global Actions
 //=========================================================
 
-bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка/i });
-bot.beginDialogAction('gif', '/gif', { matches: /^gif|\/gif|гифка/i });
+bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|смешнявка/i });
 bot.beginDialogAction('webm', '/webm', { matches: /^webm|\/webm|вебм/i });
-bot.beginDialogAction('post', '/post', { matches: /^post|\/post|случайно|тест|пост|анон|test/i });
 bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i });
 
 
@@ -50,25 +47,37 @@ bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i }
 //=========================================================
 
 function requestFile(url, type) {
+	
 	return fetch(url)
 	.then(function(res) {
 		return res.json();
 	})
 	.then(function(json) {
+		// Массив типов
+		var typeArray = [];
+		typeArray['img'] = '1';
+		typeArray['webm'] = '6';
 		
-		var selectThread = Math.floor(Math.random() * (20 - 1) + 1);
-		var selectPost = Math.floor(Math.random() * (3 - 1) + 1);
-		
-		return json.threads[selectThread].posts[selectPost];
+		// Создаём массив файлов
+		var filesArray = [];
+		json.threads.map(function(thread) {
+			thread.posts.map(function(post) {
+				post.files.map(function(file) {
+					if (file.type == typeArray[type])
+						filesArray.push(file.path);
+				});
+			});
+		});
+		return filesArray;
 	})
-	.then(function(post) {
-		if (type == 'post') {
-			return post;
-		}
-		if (type == 'img') {
-			console.log(post.files[0].path);
-			return post.files[0].path;
-		}
+	.then(function(filesArray) {
+		// Получаем рандомный файл из массива
+		var rand = Math.floor(Math.random() * filesArray.length);
+		return filesArray[rand];
+		
+	}).catch(function(err) {
+		console.error(err);
+		return false;
 	});
 }
 
@@ -127,7 +136,7 @@ bot.on('deleteUserData', function (message) {
 
 bot.dialog('/', [
 	function (session) {
-		session.endDialog("Выбери три стула. /img /gif /webm. Ну и есть ещё /post");
+		session.endDialog("Выбери два стула. /img /webm");
 	}
 ]);
 
@@ -135,6 +144,11 @@ bot.dialog('/img', [
 	function (session) {
 		requestFile(url, 'img')
 		.then(function(result) {
+			if (!result)
+				throw new Error('Ошибка');
+			
+			console.log(result);
+				
 			var msg = new builder.Message(session)
 				.attachments([{
 					contentType: "image/jpeg",
@@ -143,45 +157,28 @@ bot.dialog('/img', [
 			session.endDialog(msg);
 		})
 		.catch(function(err) {
-			session.endDialog(err);
+			console.error(err);
 		});
-	}
-]);
-bot.dialog('/gif', [
-	function (session) {
-		var msg = new builder.Message(session)
-			.attachments([{
-				contentType: "image/gif",
-				contentUrl: "https://crychan.ru/file/safe_image.gif"
-			}]);
-		session.endDialog(msg);
 	}
 ]);
 bot.dialog('/webm', [
 	function (session) {
-		var msg = new builder.Message(session)
-			.attachments([{
-				contentType: "video/webm",
-				contentUrl: "https://crychan.ru/file/14726617611862.webm"
-			}]);
-		session.endDialog(msg);
-	}
-]);
-bot.dialog('/post', [
-	function (session) {
-		requestFile(url, 'post')
+		requestFile(url, 'webm')
 		.then(function(result) {
+			if (!result)
+				throw new Error('Ошибка');
+				
+			console.log(result);
+			
 			var msg = new builder.Message(session)
-				.textFormat(builder.TextFormat.xml)
-				.attachments([
-					new builder.HeroCard(session)
-						.subtitle(result.name + " " + result.date + " #" + result.num)
-						.text((result.comment).replace(/<\/?[^>]+>/g,''))
-				]);
+				.attachments([{
+					contentType: "video/webm",
+					contentUrl: "https://2ch.hk/b/" + result
+				}]);
 			session.endDialog(msg);
 		})
 		.catch(function(err) {
-			session.endDialog(err);
+			console.error(err);
 		});
 	}
 ]);

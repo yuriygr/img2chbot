@@ -1,12 +1,12 @@
 {
   "name": "img2chbot",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "dependencies": {
     "botbuilder": "3.2.3",
     "node-fetch": "^1.6.3",
     "restify": "4.1.1"
   },
   "scripts": {
-    "start": "MICROSOFT_APP_ID=caf55826-9468-4ce1-9cdf-63e87365ea52 MICROSOFT_APP_PASSWORD=iPGZ6TChfABSZVAvjbBw9xV node app.js"
+    "start": "node app.js"
   }
 }
