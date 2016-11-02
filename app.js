@@ -42,6 +42,7 @@ bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|с�
 bot.beginDialogAction('webm', '/webm', { matches: /^webm|\/webm|вебм/i });
 bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i });
 bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|контакты|автор/i });
+bot.beginDialogAction('debug', '/debug', { matches: /^debug|\/debug|дебаг|/i });
 
 
 //=========================================================
@@ -198,5 +199,21 @@ bot.dialog('/contact', [
 	function (session) {
 		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
 		session.beginDialog('/');
+	}
+]);
+
+// Debug
+bot.dialog('/debug', [
+	function (session) {
+		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит Дебаг в продакшене?");
+	},
+	function (session, results) {
+		if (results.response == 'Да') {
+			session.endDialog('Хуй на!');
+		}
+		if (results.response == 'Нет') {
+			session.endDialog('Пидора ответ!');
+		}
+		session.endDialog('Прошёл нахуй!');
 	}
 ]);
