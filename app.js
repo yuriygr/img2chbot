@@ -209,6 +209,7 @@ bot.dialog('/debug', [
 	},
 	function (session, results) {
 		if (results.response == 'Да') {
+			session.send(session);
 			session.endDialog('Хуй на!');
 		}
 		if (results.response == 'Нет') {
