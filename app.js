@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------------
-A simple "Hello World" bot for the Microsoft Bot Framework. 
+A simple bot
 -----------------------------------------------------------------------------*/
 
 var restify = require('restify');
@@ -19,7 +19,6 @@ var server = restify.createServer({
 server.listen(process.env.port || process.env.PORT || 3978, function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
-  
 // Create chat bot
 var connector = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
@@ -31,19 +30,10 @@ var settings = {
 };
 // Make him alive!
 var bot = new builder.UniversalBot(connector, settings);
-
+// And make him listen messages
+var intents = new builder.IntentDialog();
+// Listen server
 server.post('/api/messages', connector.listen());
-
-//=========================================================
-// Bots Global Actions
-//=========================================================
-
-bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|смешнявка/i });
-bot.beginDialogAction('webm', '/webm', { matches: /^webm|\/webm|вебм/i });
-bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i });
-bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|контакты|автор/i });
-bot.beginDialogAction('debug', '/debug', { matches: /^debug|\/debug|дебаг|/i });
-
 
 //=========================================================
 // Bots Helpers
@@ -134,11 +124,26 @@ bot.on('contactRelationUpdate', function (message) {
 
 bot.on('deleteUserData', function (message) {
 	// User asked to delete their data
+	// hm
 });
 
 //=========================================================
 // Bots Dialogs
 //=========================================================
+
+bot.dialog('/', intents
+    .matches(/^img|\/img|картинка|смешнявка/i,
+    '/img')
+    .matches(/^webm|\/webm|вебм/i,
+    '/webm')
+    .matches(/^help|\/help|помощь/i,
+    '/help')
+    .matches(/^contact|\/contact|контакты|автор/i,
+    '/contact')
+    .matches(/^debug|\/debug|дебаг|/i,
+    '/debug')
+    .onDefault(builder.DialogAction.send("Прости, я тебя не понимаю."))
+);
 
 bot.dialog('/', [
 	function (session) {
@@ -205,11 +210,11 @@ bot.dialog('/contact', [
 // Debug
 bot.dialog('/debug', [
 	function (session) {
+		session.sendTyping();
 		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит да в продакшене?");
 	},
 	function (session, results) {
 		session.sendTyping();
-		session.send(results.message);
 		if (results.response == 'Да') {
 			session.endDialog('Хуй на!');
 		}
