@@ -143,6 +143,7 @@ bot.dialog('/', new builder.IntentDialog()
 	.onDefault(builder.DialogAction.send("Выбери два стула. /img /webm"))
 );
 
+// Main actions
 bot.dialog('/img', [
 	function (session) {
 		requestFile(url, 'img')
@@ -186,16 +187,15 @@ bot.dialog('/webm', [
 	}
 ]);
 
+// Staff
 bot.dialog('/help', [
 	function (session) {
 		session.endDialog("Я - раковый бот, который даёт тебе смешнявки прямо в твоём мессенджере.");
-		session.beginDialog('/');
 	}
 ]);
 bot.dialog('/contact', [
 	function (session) {
 		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
-		session.beginDialog('/');
 	}
 ]);
 
@@ -213,6 +213,7 @@ bot.dialog('/debug', [
 		if (results.response == 'Нет') {
 			session.endDialog('Пидора ответ!');
 		}
+		session.send(results.response);
 		session.endDialog('Прошёл нахуй!');
 	}
 ]);
