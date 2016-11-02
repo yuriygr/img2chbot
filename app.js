@@ -205,11 +205,12 @@ bot.dialog('/contact', [
 // Debug
 bot.dialog('/debug', [
 	function (session) {
-		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит Дебаг в продакшене?");
+		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит да в продакшене?");
 	},
 	function (session, results) {
+		session.sendTyping();
+		session.send(results.message);
 		if (results.response == 'Да') {
-			session.send(session);
 			session.endDialog('Хуй на!');
 		}
 		if (results.response == 'Нет') {
