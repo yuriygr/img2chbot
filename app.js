@@ -30,8 +30,6 @@ var settings = {
 };
 // Make him alive!
 var bot = new builder.UniversalBot(connector, settings);
-// And make him listen messages
-var intents = new builder.IntentDialog();
 // Listen server
 server.post('/api/messages', connector.listen());
 
@@ -131,25 +129,19 @@ bot.on('deleteUserData', function (message) {
 // Bots Dialogs
 //=========================================================
 
-bot.dialog('/', intents
-    .matches(/^img|\/img|картинка|смешнявка/i,
-    '/img')
-    .matches(/^webm|\/webm|вебм/i,
-    '/webm')
-    .matches(/^help|\/help|помощь/i,
-    '/help')
-    .matches(/^contact|\/contact|контакты|автор/i,
-    '/contact')
-    .matches(/^debug|\/debug|дебаг|/i,
-    '/debug')
-    .onDefault(builder.DialogAction.send("Прости, я тебя не понимаю."))
+bot.dialog('/', new builder.IntentDialog()
+	.matches(/^img|\/img|картинка|смешнявка/i,
+	'/img')
+	.matches(/^webm|\/webm|вебм/i,
+	'/webm')
+	.matches(/^help|\/help|помощь/i,
+	'/help')
+	.matches(/^contact|\/contact|контакты|автор/i,
+	'/contact')
+	.matches(/^debug|\/debug|дебаг|/i,
+	'/debug')
+	.onDefault(builder.DialogAction.send("Выбери два стула. /img /webm"))
 );
-
-bot.dialog('/', [
-	function (session) {
-		session.endDialog("Выбери два стула. /img /webm");
-	}
-]);
 
 bot.dialog('/img', [
 	function (session) {
