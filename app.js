@@ -6,7 +6,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
 var host = 'https://2ch.hk/b/';
-var url = host + 'index.json';
+var url = host + 'threads.json';
 
 //=========================================================
 // Bot Setup
@@ -37,7 +37,7 @@ server.post('/api/messages', connector.listen());
 // Bots Helpers
 //=========================================================
 
-function requestFile(url, type) {
+function requestFile(type) {
 	
 	return fetch(url)
 	.then(function(res) {
@@ -146,7 +146,7 @@ bot.dialog('/', new builder.IntentDialog()
 // Main actions
 bot.dialog('/img', [
 	function (session) {
-		requestFile(url, 'img')
+		requestFile('img')
 		.then(function(result) {
 			if (!result)
 				throw new Error('Ошибка получения картинки');
@@ -167,7 +167,7 @@ bot.dialog('/img', [
 ]);
 bot.dialog('/webm', [
 	function (session) {
-		requestFile(url, 'webm')
+		requestFile('webm')
 		.then(function(result) {
 			if (!result)
 				throw new Error('Ошибка получения вебм');
