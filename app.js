@@ -25,7 +25,7 @@ var connector = new builder.ChatConnector({
 	appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 // Settings for chat bot
-var settings = { 
+var settings = {
 	dialogErrorMessage: 'Ой, у нас проблемы.'
 };
 // Make him alive!
@@ -129,6 +129,7 @@ bot.on('deleteUserData', function (message) {
 // Bots Dialogs
 //=========================================================
 
+// Listen matches
 bot.dialog('/', new builder.IntentDialog()
 	.matches(/^img|\/img|картинка|смешнявка/i,
 	'/img')
@@ -180,24 +181,6 @@ bot.dialog('/webm', [
 					contentUrl: host + result
 				}]);
 			session.endDialog(msg);
-		})
-		.catch(function(err) {
-			console.error(err);
-		});
-	}
-]);
-
-// Top threads in Random
-bot.dialog('/top', [
-	function (session) {
-		requestTop(url)
-		.then(function(result) {
-			if (!result)
-				throw new Error('Ошибка получения данных');
-				
-			session.sendTyping();
-
-			session.endDialog('Пока что нету');
 		})
 		.catch(function(err) {
 			console.error(err);
