@@ -213,7 +213,6 @@ bot.dialog('/debug', [
 		if (results.response == 'Нет') {
 			session.endDialog('Пидора ответ!');
 		}
-		session.send(results.response);
 		session.endDialog('Прошёл нахуй!');
 	}
 ]);
