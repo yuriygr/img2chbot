@@ -6,7 +6,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
 var host = 'https://2ch.hk/b/';
-var url = host + 'threads.json';
+var url = host + 'index.json';
 
 //=========================================================
 // Bot Setup
