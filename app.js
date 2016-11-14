@@ -1,12 +1,13 @@
 /*-----------------------------------------------------------------------------
-A simple "Hello World" bot for the Microsoft Bot Framework. 
+Смешные скартинки с двача
 -----------------------------------------------------------------------------*/
 
 var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
-var host = 'https://2ch.hk/b/';
-var url = host + 'index.json';
+var host = 'https://2ch.hk';
+var board = '/b/';
+var url = host + board + 'index.json';
 
 //=========================================================
 // Bot Setup
@@ -35,7 +36,7 @@ var bot = new builder.UniversalBot(connector, settings);
 server.post('/api/messages', connector.listen());
 
 //=========================================================
-// Bots Global Actions
+// Bot Global Actions
 //=========================================================
 
 bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|смешнявка/i });
@@ -45,7 +46,7 @@ bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|ко
 
 
 //=========================================================
-// Bots Helpers
+// Bot Helpers
 //=========================================================
 
 function requestFile(url, type) {
@@ -136,7 +137,7 @@ bot.on('deleteUserData', function (message) {
 });
 
 //=========================================================
-// Bots Dialogs
+// Bot Dialogs
 //=========================================================
 
 bot.dialog('/', [
@@ -197,6 +198,5 @@ bot.dialog('/help', [
 bot.dialog('/contact', [
 	function (session) {
 		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
-		session.beginDialog('/');
 	}
 ]);
