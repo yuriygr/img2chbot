@@ -1,9 +1,5 @@
 /*-----------------------------------------------------------------------------
-<<<<<<< HEAD
-Смешные скартинки с двача
-=======
-A simple bot
->>>>>>> origin/master
+Смешные картинки с двача
 -----------------------------------------------------------------------------*/
 
 var restify = require('restify');
@@ -39,7 +35,6 @@ var bot = new builder.UniversalBot(connector, settings);
 server.post('/api/messages', connector.listen());
 
 //=========================================================
-<<<<<<< HEAD
 // Bot Global Actions
 //=========================================================
 
@@ -50,10 +45,7 @@ bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|ко
 
 
 //=========================================================
-// Bot Helpers
-=======
 // Bots Helpers
->>>>>>> origin/master
 //=========================================================
 
 function requestFile(url, type) {
