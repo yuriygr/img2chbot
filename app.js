@@ -1,5 +1,9 @@
 /*-----------------------------------------------------------------------------
+<<<<<<< HEAD
 Смешные скартинки с двача
+=======
+A simple bot
+>>>>>>> origin/master
 -----------------------------------------------------------------------------*/
 
 var restify = require('restify');
@@ -20,22 +24,22 @@ var server = restify.createServer({
 server.listen(process.env.port || process.env.PORT || 3978, function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
-  
 // Create chat bot
 var connector = new builder.ChatConnector({
 	appId: process.env.MICROSOFT_APP_ID,
 	appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 // Settings for chat bot
-var settings = { 
+var settings = {
 	dialogErrorMessage: 'Ой, у нас проблемы.'
 };
 // Make him alive!
 var bot = new builder.UniversalBot(connector, settings);
-
+// Listen server
 server.post('/api/messages', connector.listen());
 
 //=========================================================
+<<<<<<< HEAD
 // Bot Global Actions
 //=========================================================
 
@@ -47,6 +51,9 @@ bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|ко
 
 //=========================================================
 // Bot Helpers
+=======
+// Bots Helpers
+>>>>>>> origin/master
 //=========================================================
 
 function requestFile(url, type) {
@@ -134,18 +141,29 @@ bot.on('contactRelationUpdate', function (message) {
 
 bot.on('deleteUserData', function (message) {
 	// User asked to delete their data
+	// hm
 });
 
 //=========================================================
 // Bot Dialogs
 //=========================================================
 
-bot.dialog('/', [
-	function (session) {
-		session.endDialog("Выбери два стула. /img /webm");
-	}
-]);
+// Listen matches
+bot.dialog('/', new builder.IntentDialog()
+	.matches(/^img|\/img|картинка|смешнявка/i,
+	'/img')
+	.matches(/^webm|\/webm|вебм/i,
+	'/webm')
+	.matches(/^help|\/help|помощь/i,
+	'/help')
+	.matches(/^contact|\/contact|контакты|автор/i,
+	'/contact')
+	.matches(/^debug|\/debug|дебаг|/i,
+	'/debug')
+	.onDefault(builder.DialogAction.send("Выбери два стула. /img /webm"))
+);
 
+// Main actions
 bot.dialog('/img', [
 	function (session) {
 		requestFile(url, 'img')
@@ -189,14 +207,32 @@ bot.dialog('/webm', [
 	}
 ]);
 
+// Staff
 bot.dialog('/help', [
 	function (session) {
 		session.endDialog("Я - раковый бот, который даёт тебе смешнявки прямо в твоём мессенджере.");
-		session.beginDialog('/');
 	}
 ]);
 bot.dialog('/contact', [
 	function (session) {
 		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
+	}
+]);
+
+// Debug
+bot.dialog('/debug', [
+	function (session) {
+		session.sendTyping();
+		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит да в продакшене?");
+	},
+	function (session, results) {
+		session.sendTyping();
+		if (results.response == 'Да') {
+			session.endDialog('Хуй на!');
+		}
+		if (results.response == 'Нет') {
+			session.endDialog('Пидора ответ!');
+		}
+		session.endDialog('Прошёл нахуй!');
 	}
 ]);
