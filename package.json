@@ -2,9 +2,9 @@
   "name": "img2chbot",
   "version": "1.0.3",
   "dependencies": {
-    "botbuilder": "3.2.3",
+    "botbuilder": "^3.8.3",
     "node-fetch": "^1.6.3",
-    "restify": "4.1.1"
+    "restify": "^4.3.0"
   },
   "scripts": {
     "start": "node app.js"
