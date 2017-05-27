@@ -1,10 +1,11 @@
-/*-----------------------------------------------------------------------------
-Смешные картинки с двача
------------------------------------------------------------------------------*/
+//=========================================================
+// Смешные картинки с Двача
+//=========================================================
 
 var restify = require('restify');
 var builder = require('botbuilder');
 var fetch = require('node-fetch');
+
 var host = 'https://2ch.hk';
 var board = '/b/';
 var url = host + board + 'index.json';
@@ -27,21 +28,15 @@ var connector = new builder.ChatConnector({
 });
 // Settings for chat bot
 var settings = {
-	dialogErrorMessage: 'Ой, у нас проблемы.'
+	dialogErrorMessage: 'Ой, у нас проблемы.',
+    localizerSettings: { 
+        defaultLocale: "ru" 
+    }
 };
 // Make him alive!
 var bot = new builder.UniversalBot(connector, settings);
 // Listen server
 server.post('/api/messages', connector.listen());
-
-//=========================================================
-// Bot Global Actions
-//=========================================================
-
-bot.beginDialogAction('img', '/img', { matches: /^img|\/img|картинка|смешнявка/i });
-bot.beginDialogAction('webm', '/webm', { matches: /^webm|\/webm|вебм/i });
-bot.beginDialogAction('help', '/help', { matches: /^help|\/help|помощь/i });
-bot.beginDialogAction('contact', '/contact', { matches: /^contact|\/contact|контакты|автор/i });
 
 
 //=========================================================
@@ -87,56 +82,6 @@ function requestFile(url, type) {
 }
 
 //=========================================================
-// Activity Events
-//=========================================================
-
-bot.on('conversationUpdate', function (message) {
-   // Check for group conversations
-	if (message.address.conversation.isGroup) {
-		// Send a hello message when bot is added
-		if (message.membersAdded) {
-			message.membersAdded.forEach(function (identity) {
-				if (identity.id === message.address.bot.id) {
-					var reply = new builder.Message()
-						.address(message.address)
-						.text("Привет, рачки. Теперь я тут отвечаю за смешнявки с двача. Подробнее по команде 'help'");
-					bot.send(reply);
-				}
-			});
-		}
-
-		// Send a goodbye message when bot is removed
-		if (message.membersRemoved) {
-			message.membersRemoved.forEach(function (identity) {
-				if (identity.id === message.address.bot.id) {
-					var reply = new builder.Message()
-						.address(message.address)
-						.text("Пока, быдло.");
-					bot.send(reply);
-				}
-			});
-		}
-	}
-});
-
-bot.on('contactRelationUpdate', function (message) {
-	if (message.action === 'add') {
-		var name = message.user ? message.user.name : null;
-		var reply = new builder.Message()
-			.address(message.address)
-			.text("Hello %s... Thanks for adding me. Say 'help' to see some great demos.", name || 'there');
-		bot.send(reply);
-	} else {
-		// delete their data
-	}
-});
-
-bot.on('deleteUserData', function (message) {
-	// User asked to delete their data
-	// hm
-});
-
-//=========================================================
 // Bot Dialogs
 //=========================================================
 
@@ -150,8 +95,6 @@ bot.dialog('/', new builder.IntentDialog()
 	'/help')
 	.matches(/^contact|\/contact|контакты|автор/i,
 	'/contact')
-	.matches(/^debug|\/debug|дебаг|/i,
-	'/debug')
 	.onDefault(builder.DialogAction.send("Выбери два стула. /img /webm"))
 );
 
@@ -160,32 +103,43 @@ bot.dialog('/img', [
 	function (session) {
 		requestFile(url, 'img')
 		.then(function(result) {
-			if (!result)
-				throw new Error('Ошибка получения картинки');
-			
-			console.log(result);
-				
-			var msg = new builder.Message(session)
-				.attachments([{
-					contentType: "image/jpeg",
-					contentUrl: host + result
-				}]);
-			session.endDialog(msg);
+			if (!result) throw new Error('Ошибка получения картинки');
+
+			session.send({
+				//text: 'Тред: ',
+			    attachments: [{
+		            contentType: "image/jpeg",
+		            contentUrl: host + result
+		        }]
+			});
+		})
+		.then(function(result) {
+			// Спросим, может ещё хочет?
+			builder.Prompts.choice(session, 'Ещё поискать?', ['Да', 'Нет']);
 		})
 		.catch(function(err) {
-			console.error(err);
+			session.endDialog("Ошибка: " + err);
 		});
+	},
+	function (session, results) {
+		switch (results.response.index) {
+			case 0:
+				session.beginDialog('/img');
+				break;
+			
+			default:
+				session.beginDialog('/no');
+		}
 	}
-]);
+])
+.triggerAction({ matches: /^img|\/img|картинка|смешнявка/i });
 bot.dialog('/webm', [
 	function (session) {
 		requestFile(url, 'webm')
 		.then(function(result) {
 			if (!result)
 				throw new Error('Ошибка получения вебм');
-				
-			console.log(result);
-			
+
 			var msg = new builder.Message(session)
 				.attachments([{
 					contentType: "video/webm",
@@ -197,34 +151,26 @@ bot.dialog('/webm', [
 			console.error(err);
 		});
 	}
-]);
+])
+.triggerAction({ matches: /^webm|\/webm|вебм/i });
 
-// Staff
+// Help
 bot.dialog('/help', [
 	function (session) {
-		session.endDialog("Я - раковый бот, который даёт тебе смешнявки прямо в твоём мессенджере.");
+		session.endDialog("Я - раковый бот, который даёт тебе смешнявки из /b/ прямо в твоём мессенджере.");
 	}
-]);
+])
+.triggerAction({ matches: /^help|\/help|помощь/i });
+// Contacts
 bot.dialog('/contact', [
 	function (session) {
-		session.endDialog("Пиши на почту a1d516ac5f5d290@gmail.com");
+		session.endDialog("Пиши @yuriygr");
 	}
-]);
-
-// Debug
-bot.dialog('/debug', [
+])
+.triggerAction({ matches: /^contact|\/contact|контакты|автор/i });
+// No
+bot.dialog('/no', [
 	function (session) {
-		session.sendTyping();
-		builder.Prompts.text(session, "Ты что вот думаешь, что мой гениальнейший разработчик оставит да в продакшене?");
-	},
-	function (session, results) {
-		session.sendTyping();
-		if (results.response == 'Да') {
-			session.endDialog('Хуй на!');
-		}
-		if (results.response == 'Нет') {
-			session.endDialog('Пидора ответ!');
-		}
-		session.endDialog('Прошёл нахуй!');
+		session.endDialog("Ну ладно.");
 	}
 ]);
