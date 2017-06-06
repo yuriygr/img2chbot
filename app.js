@@ -110,13 +110,14 @@ bot.dialog('/img', [
 			    attachments: [{
 		            contentType: "image/jpeg",
 		            contentUrl: host + result
-		        }]
+		        }],
+		        source: '2ch.hk'
 			});
 		})
-		.then(function(result) {
+		/*.then(function(result) {
 			// Спросим, может ещё хочет?
 			builder.Prompts.choice(session, 'Ещё поискать?', ['Да', 'Нет']);
-		})
+		})*/
 		.catch(function(err) {
 			session.endDialog("Ошибка: " + err);
 		});
@@ -133,6 +134,8 @@ bot.dialog('/img', [
 	}
 ])
 .triggerAction({ matches: /^img|\/img|картинка|смешнявка/i });
+
+// WebM
 bot.dialog('/webm', [
 	function (session) {
 		requestFile(url, 'webm')
@@ -161,6 +164,7 @@ bot.dialog('/help', [
 	}
 ])
 .triggerAction({ matches: /^help|\/help|помощь/i });
+
 // Contacts
 bot.dialog('/contact', [
 	function (session) {
@@ -168,6 +172,7 @@ bot.dialog('/contact', [
 	}
 ])
 .triggerAction({ matches: /^contact|\/contact|контакты|автор/i });
+
 // No
 bot.dialog('/no', [
 	function (session) {
