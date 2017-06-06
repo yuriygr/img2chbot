@@ -110,8 +110,7 @@ bot.dialog('/img', [
 			    attachments: [{
 		            contentType: "image/jpeg",
 		            contentUrl: host + result
-		        }],
-		        source: '2ch.hk'
+		        }]
 			});
 		})
 		/*.then(function(result) {
